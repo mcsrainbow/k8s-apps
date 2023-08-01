@@ -72,7 +72,7 @@ spec:
           - mountPath: "/opt/sonarqube/extensions/"
             name: sonar-extensions
       imagePullSecrets:
-        - name: gitlab
+        - name: sonarqube-secret-gitlab
       volumes:
       - name: sonar-data
         persistentVolumeClaim:
