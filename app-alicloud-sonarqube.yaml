@@ -1,0 +1,135 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: sonar-dev
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  namespace: sonar-dev
+  name: sonarqube-secret-postgresql
+type: Opaque
+data:
+  password: c29uYXJxdWJlCg==
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  namespace: sonar-dev
+  name: sonarqube-sts
+spec:
+  serviceName: "sonarqube"
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sonarqube
+  template:
+    metadata:
+      labels:
+        app: sonarqube
+    spec:
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+      containers:
+        - name: sonarqube
+          image: sonarqube:10.1.0-community
+          args:
+            - -Dsonar.web.context=/sonar
+            - -Dsonar.core.serverBaseURL=https://dev.example.com/sonar
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 9000
+              protocol: TCP
+          env:
+            - name: SONAR_JDBC_USERNAME
+              value: sonar
+            - name: SONAR_JDBC_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: sonarqube-secret-postgresql
+                  key: password
+            - name: SONAR_JDBC_URL
+              value: jdbc:postgresql://postgres.example.com:5432/sonar
+            - name: aliyun_logs_log-sonarqube-stdout
+              value: stdout
+            - name: aliyun_logs_log-sonarqube-varlog
+              value: /var/log/*.log
+            - name: aliyun_logs_mytag1_tags
+              value: tag1=v1
+          resources:
+            requests:
+              cpu: "0.5"
+              memory: 1Gi
+            limits:
+              cpu: "2"
+              memory: 2Gi
+          volumeMounts:
+          - mountPath: "/opt/sonarqube/data/"
+            name: sonar-data
+          - mountPath: "/opt/sonarqube/extensions/"
+            name: sonar-extensions
+      imagePullSecrets:
+        - name: gitlab
+      volumes:
+      - name: sonar-data
+        persistentVolumeClaim:
+          claimName: sonarqube-pvc-data
+      - name: sonar-extensions
+        persistentVolumeClaim:
+          claimName: sonarqube-pvc-extensions
+  volumeClaimTemplates:
+  - metadata:
+      name: sonar-data
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      storageClassName: alicloud-disk-available
+      resources:
+        requests:
+          storage: 20Gi
+  - metadata:
+      name: sonar-extensions
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      storageClassName: alicloud-disk-available
+      resources:
+        requests:
+          storage: 20Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: sonar-dev
+  name: sonarqube-svc
+spec:
+  ports:
+    - port: 9000
+      targetPort: 9000
+      protocol: TCP
+  selector:
+    app: sonarqube
+  clusterIP: None
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  namespace: sonar-dev
+  name: sonarqube-ingress
+spec:
+  ingressClassName: alb
+  tls:
+    - hosts:
+        - dev.example.com
+  rules:
+    - host: dev.example.com
+      http:
+        paths:
+          - path: /sonar
+            pathType: Prefix
+            backend:
+              service:
+                name: sonarqube-svc
+                port:
+                  number: 9000
