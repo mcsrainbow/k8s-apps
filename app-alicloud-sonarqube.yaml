@@ -67,36 +67,36 @@ spec:
               cpu: "2"
               memory: 2Gi
           volumeMounts:
-          - mountPath: "/opt/sonarqube/data/"
-            name: sonar-data
-          - mountPath: "/opt/sonarqube/extensions/"
-            name: sonar-extensions
+            - name: sonar-data
+              mountPath: "/opt/sonarqube/data/"
+            - name: sonar-extensions
+              mountPath: "/opt/sonarqube/extensions/"
       imagePullSecrets:
         - name: sonarqube-secret-gitlab
       volumes:
-      - name: sonar-data
-        persistentVolumeClaim:
-          claimName: sonarqube-pvc-data
-      - name: sonar-extensions
-        persistentVolumeClaim:
-          claimName: sonarqube-pvc-extensions
+        - name: sonar-data
+          persistentVolumeClaim:
+            claimName: sonarqube-pvc-data
+        - name: sonar-extensions
+          persistentVolumeClaim:
+            claimName: sonarqube-pvc-extensions
   volumeClaimTemplates:
-  - metadata:
-      name: sonar-data
-    spec:
-      accessModes: [ "ReadWriteOnce" ]
-      storageClassName: alicloud-disk-available
-      resources:
-        requests:
-          storage: 20Gi
-  - metadata:
-      name: sonar-extensions
-    spec:
-      accessModes: [ "ReadWriteOnce" ]
-      storageClassName: alicloud-disk-available
-      resources:
-        requests:
-          storage: 20Gi
+    - metadata:
+        name: sonar-data
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        storageClassName: alicloud-disk-available
+        resources:
+          requests:
+            storage: 20Gi
+    - metadata:
+        name: sonar-extensions
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        storageClassName: alicloud-disk-available
+        resources:
+          requests:
+            storage: 20Gi
 ---
 apiVersion: v1
 kind: Service
