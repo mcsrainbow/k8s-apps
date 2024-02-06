@@ -37,6 +37,7 @@ spec:
   successfulJobsHistoryLimit: 2
   failedJobsHistoryLimit: 1
   jobTemplate:
+    backoffLimit: 1
     spec:
       template:
         spec:
@@ -44,6 +45,9 @@ spec:
           containers:
             - name: ops-podscleanup-etrans
               image: bitnami/kubectl:1.27.5
+              env:
+                - name: TZ
+                  value: "Asia/Shanghai"
               command:
                 - /bin/sh
                 - -c
