@@ -65,7 +65,7 @@ patches:
     patch: |-
       - op: replace
         path: /spec/rules/0/host
-        value: proxy.example.com
+        value: web.example.com
   - target:
       group: networking.k8s.io
       version: v1
@@ -74,4 +74,4 @@ patches:
     patch: |-
       - op: replace
         path: /spec/rules/0/host
-        value: front.example.com
+        value: web.example.com

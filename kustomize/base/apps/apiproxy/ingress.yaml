@@ -5,7 +5,7 @@ metadata:
 spec:
   ingressClassName: nginx
   rules:
-    - host: proxy.dev.example.com
+    - host: web.dev.example.com
       http:
         paths:
           - path: /api/v1/
