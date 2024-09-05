@@ -1,0 +1,17 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: webfront-ingress
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: front.dev.example.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: webfront-svc
+                port:
+                  number: 80

@@ -1,0 +1,33 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: apiproxy-deployment
+spec:
+  template:
+    spec:
+      volumes:
+        - name: apiproxy-configmap-volume
+          configMap:
+            name: bu-project-apiproxy-configmap
+      containers:
+        - name: apiproxy
+          image: registry.example.com/project/apiproxy:1.0
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: TZ
+              value: Asia/Shanghai
+          resources:
+            requests:
+              cpu: 125m
+              memory: 256Mi
+            limits:
+              cpu: 125m
+              memory: 256Mi
+          lifecycle:
+            preStop:
+              exec:
+                command: ["/bin/sh", "-c", "sleep 60"]
+          volumeMounts:
+            - name: apiproxy-configmap-volume
+              mountPath: /etc/nginx/conf.d

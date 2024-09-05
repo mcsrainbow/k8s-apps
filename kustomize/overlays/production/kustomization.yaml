@@ -1,0 +1,77 @@
+resources:
+  - ../../base
+
+namespace: bu-project-prod
+namePrefix: bu-project-
+
+images:
+  - name: registry.example.com/project/webfront
+    newTag: release-2024.09.05.2230
+
+configMapGenerator:
+  - name: apiproxy-configmap
+    files:
+      - files/nginx.conf
+    options:
+      disableNameSuffixHash: true
+
+patches:
+  - target:
+      group: apps
+      version: v1
+      kind: Deployment
+      name: webfront-deployment
+    patch: |-
+      - op: add
+        path: /spec/template/spec/containers/0/env/-
+        value: 
+          name: APP_CONFIG
+          value: prod
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/requests/cpu
+        value: 1000m
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/requests/memory
+        value: 2Gi
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/limits/cpu
+        value: 1000m
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/limits/memory
+        value: 2Gi
+  - target:
+      group: apps
+      version: v1
+      kind: Deployment
+      name: apiproxy-deployment
+    patch: |-
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/requests/cpu
+        value: 500m
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/requests/memory
+        value: 1Gi
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/limits/cpu
+        value: 500m
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/limits/memory
+        value: 1Gi
+  - target:
+      group: networking.k8s.io
+      version: v1
+      kind: Ingress
+      name: apiproxy-ingress
+    patch: |-
+      - op: replace
+        path: /spec/rules/0/host
+        value: proxy.example.com
+  - target:
+      group: networking.k8s.io
+      version: v1
+      kind: Ingress
+      name: webfront-ingress
+    patch: |-
+      - op: replace
+        path: /spec/rules/0/host
+        value: front.example.com

@@ -1,0 +1,28 @@
+---
+kind: Kustomization
+
+resources:
+  - apps/webfront
+  - apps/apiproxy
+ 
+commonAnnotations:
+  app.kubernetes.io/managed-by: Kustomization
+
+replicas:
+- name: apiproxy-deployment
+  count: 1
+- name: webfront-deployment
+  count: 2
+
+patches:
+  - path: patches/deployment.yaml
+    target:
+      kind: Deployment
+
+secretGenerator:
+  - name: dockerregistry-secret
+    type: kubernetes.io/dockerconfigjson
+    files:
+      - .dockerconfigjson=files/dockerconfigjson.encrypted
+    options:
+      disableNameSuffixHash: true

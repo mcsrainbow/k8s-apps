@@ -1,0 +1,10 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: placeholder
+spec:
+  template:
+    spec:
+      terminationGracePeriodSeconds: 120
+      imagePullSecrets:
+        - name: bu-project-dockerregistry-secret

@@ -1,0 +1,77 @@
+resources:
+  - ../../base
+
+namespace: bu-project-uat
+namePrefix: bu-project-
+
+images:
+  - name: registry.example.com/project/webfront
+    newTag: uat-2024.09.05.1805
+
+configMapGenerator:
+  - name: apiproxy-configmap
+    files:
+      - files/nginx.conf
+    options:
+      disableNameSuffixHash: true
+
+patches:
+  - target:
+      group: apps
+      version: v1
+      kind: Deployment
+      name: webfront-deployment
+    patch: |-
+      - op: add
+        path: /spec/template/spec/containers/0/env/-
+        value: 
+          name: APP_CONFIG
+          value: uat
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/requests/cpu
+        value: 500m
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/requests/memory
+        value: 1Gi
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/limits/cpu
+        value: 500m
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/limits/memory
+        value: 1Gi
+  - target:
+      group: apps
+      version: v1
+      kind: Deployment
+      name: apiproxy-deployment
+    patch: |-
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/requests/cpu
+        value: 250m
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/requests/memory
+        value: 512Mi
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/limits/cpu
+        value: 250m
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/limits/memory
+        value: 512Mi
+  - target:
+      group: networking.k8s.io
+      version: v1
+      kind: Ingress
+      name: apiproxy-ingress
+    patch: |-
+      - op: replace
+        path: /spec/rules/0/host
+        value: proxy.uat.example.com
+  - target:
+      group: networking.k8s.io
+      version: v1
+      kind: Ingress
+      name: webfront-ingress
+    patch: |-
+      - op: replace
+        path: /spec/rules/0/host
+        value: front.uat.example.com

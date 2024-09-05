@@ -1,0 +1,29 @@
+resources:
+  - ../../base
+
+namespace: bu-project-dev
+namePrefix: bu-project-
+
+images:
+  - name: registry.example.com/project/webfront
+    newTag: dev-2024.09.05.0923
+
+configMapGenerator:
+  - name: apiproxy-configmap
+    files:
+      - files/nginx.conf
+    options:
+      disableNameSuffixHash: true
+
+patches:
+  - target:
+      group: apps
+      version: v1
+      kind: Deployment
+      name: webfront-deployment
+    patch: |-
+      - op: add
+        path: /spec/template/spec/containers/0/env/-
+        value: 
+          name: APP_CONFIG
+          value: dev

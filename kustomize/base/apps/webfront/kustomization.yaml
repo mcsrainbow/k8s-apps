@@ -1,0 +1,16 @@
+---
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - deployment.yaml
+  - service.yaml
+  - ingress.yaml
+
+labels:
+  - pairs:
+      app: webfront
+    # add labels to spec.selector.matchLabels
+    includeSelectors: true
+    # add labels to spec.template.metadata.labels
+    includeTemplates: true
