@@ -9,12 +9,6 @@ resources:
 commonAnnotations:
   app.kubernetes.io/managed-by: Kustomization
 
-replicas:
-- name: apiproxy-deployment
-  count: 1
-- name: webfront-deployment
-  count: 2
-
 patches:
   - path: patches/imagePullSecrets.yaml
     target:

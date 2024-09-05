@@ -8,16 +8,22 @@ resources:
 namespace: bu-project-uat
 namePrefix: bu-project-
 
-images:
-  - name: registry.example.com/project/webfront
-    newTag: uat-2024.09.05.1805
-
 configMapGenerator:
   - name: apiproxy-configmap
     files:
       - files/nginx.conf
     options:
       disableNameSuffixHash: true
+
+images:
+  - name: registry.example.com/project/webfront
+    newTag: uat-2024.09.05.1805
+
+replicas:
+- name: apiproxy-deployment
+  count: 1
+- name: webfront-deployment
+  count: 1
 
 patches:
   - target:
