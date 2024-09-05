@@ -5,6 +5,5 @@ metadata:
 spec:
   template:
     spec:
-      terminationGracePeriodSeconds: 120
       imagePullSecrets:
-        - name: bu-project-dockerregistry-secret
+        - name: dockerregistry-secret

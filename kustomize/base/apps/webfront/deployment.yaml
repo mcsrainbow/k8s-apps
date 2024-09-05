@@ -6,10 +6,14 @@ metadata:
 spec:
   template:
     spec:
+      terminationGracePeriodSeconds: 120
       containers:
         - name: webfront
           image: registry.example.com/project/webfront:1.0
           imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8080
+              protocol: TCP
           env:
             - name: TZ
               value: Asia/Shanghai

@@ -9,11 +9,15 @@ spec:
       volumes:
         - name: apiproxy-configmap-volume
           configMap:
-            name: bu-project-apiproxy-configmap
+            name: apiproxy-configmap
+      terminationGracePeriodSeconds: 120
       containers:
         - name: apiproxy
           image: registry.example.com/project/apiproxy:1.0
           imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 80
+              protocol: TCP
           env:
             - name: TZ
               value: Asia/Shanghai
