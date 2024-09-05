@@ -1,6 +1,6 @@
 # k8s-apps
 
-## Kustomize Practice
+## Kustomize practice
 
 ```
 kustomize
