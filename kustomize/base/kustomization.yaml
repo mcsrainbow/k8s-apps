@@ -16,7 +16,7 @@ replicas:
   count: 2
 
 patches:
-  - path: patches/deployment.yaml
+  - path: patches/imagePullSecrets.yaml
     target:
       kind: Deployment
 
