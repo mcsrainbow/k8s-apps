@@ -1,5 +1,7 @@
 # k8s-apps
 
+## Kustomize Practice
+
 ```
 kustomize
 ├── base
@@ -32,4 +34,10 @@ kustomize
         ├── files
         │   └── nginx.conf
         └── kustomization.yaml
+```
+
+```bash
+kustomize build overlays/development
+kustomize build overlays/staging
+kustomize build overlays/production
 ```
