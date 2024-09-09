@@ -1,0 +1,20 @@
+global:
+  namespace: bu-project-dev
+
+apiproxy:
+  replicas: 1
+  cpu: "125m"
+  memory: "256Mi"
+  host: web.dev.example.com
+
+webfront:
+  annotations:
+    app.kubernetes.io/name: webfront
+  replicas: 1
+  imageTag: "dev-2024.09.05.0923"
+  cpu: "250m"
+  memory: "512Mi"
+  host: web.dev.example.com
+  extraEnv:
+    - name: APP_CONFIG
+      value: dev

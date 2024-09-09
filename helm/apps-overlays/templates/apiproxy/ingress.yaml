@@ -1,0 +1,20 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  {{- include "apiproxy.annotations" . | nindent 2 }}
+  {{- include "apiproxy.labels" . | nindent 2 }}
+  namespace: {{ .Values.global.namespace }}
+  name: {{ .Values.global.namePrefix }}-apiproxy-ingress
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: {{ .Values.apiproxy.host }}
+      http:
+        paths:
+          - path: /api/v1/
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ .Values.global.namePrefix }}-apiproxy-svc
+                port:
+                  number: 80

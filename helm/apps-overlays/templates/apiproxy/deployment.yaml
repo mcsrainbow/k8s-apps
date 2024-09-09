@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  {{- include "apiproxy.annotations" . | nindent 2 }}
+  {{- include "apiproxy.labels" . | nindent 2 }}
+  namespace: {{ .Values.global.namespace }}
+  name: {{ .Values.global.namePrefix }}-apiproxy-deployment
+spec:
+  replicas: {{ .Values.apiproxy.replicas }}
+  selector:
+    matchLabels:
+      {{- include "apiproxy.selectorLabels" $ | nindent 6 }}
+  template:
+    metadata:
+      {{- include "apiproxy.annotations" . | nindent 6 }}
+      {{- include "apiproxy.labels" . | nindent 6 }}
+    spec:
+      terminationGracePeriodSeconds: 120
+      imagePullSecrets:
+        - name: {{ .Values.global.namePrefix }}-dockerregistry-secret
+      volumes:
+        - name: apiproxy-configmap-volume
+          configMap:
+            name: {{ .Values.global.namePrefix }}-apiproxy-configmap
+      containers:
+        - name: apiproxy
+          image: {{ .Values.apiproxy.image }}:{{ .Values.apiproxy.imageTag }}
+          imagePullPolicy: {{ .Values.apiproxy.imagePullPolicy }}
+          ports:
+            - containerPort: 80
+              protocol: TCP
+          env:
+            - name: TZ
+              value: Asia/Shanghai
+            {{- if .Values.apiproxy.extraEnv }}
+            {{- include "apiproxy.extraEnv" . | nindent 12 }}
+            {{- end }}
+          resources:
+            requests:
+              cpu: {{ .Values.apiproxy.cpu }}
+              memory: {{ .Values.apiproxy.memory }}
+            limits:
+              cpu: {{ .Values.apiproxy.cpu }}
+              memory: {{ .Values.apiproxy.memory }}
+          lifecycle:
+            preStop:
+              exec:
+                command: ["/bin/sh", "-c", "sleep 60"]
+          volumeMounts:
+            - name: apiproxy-configmap-volume
+              mountPath: /etc/nginx/conf.d

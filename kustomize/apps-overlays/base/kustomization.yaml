@@ -5,7 +5,7 @@ kind: Kustomization
 resources:
   - apps/webfront
   - apps/apiproxy
- 
+
 commonAnnotations:
   app.kubernetes.io/managed-by: Kustomization
 

@@ -1,0 +1,4 @@
+apiVersion: v2
+name: apps-overlays
+description: A Helm chart for deploying apiproxy and webfront applications
+version: 0.1.0

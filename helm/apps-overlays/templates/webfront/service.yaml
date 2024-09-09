@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  {{- include "webfront.annotations" . | nindent 2 }}
+  {{- include "webfront.labels" . | nindent 2 }}
+  namespace: {{ .Values.global.namespace }}
+  name: {{ .Values.global.namePrefix }}-webfront-svc
+spec:
+  clusterIP: None
+  ports:
+    - port: 80
+      targetPort: 80
+      protocol: TCP
+  selector:
+    {{- include "webfront.selectorLabels" . | nindent 4 }}

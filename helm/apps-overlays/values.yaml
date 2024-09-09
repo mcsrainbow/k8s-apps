@@ -1,0 +1,17 @@
+global:
+  namePrefix: bu-project
+  annotations:
+    app.kubernetes.io/managed-by: Kustomization
+
+apiproxy:
+  labels:
+    app: apiproxy
+  image: registry.example.com/project/apiproxy
+  imageTag: "1.0"
+  imagePullPolicy: IfNotPresent
+
+webfront:
+  labels:
+    app: webfront
+  image: registry.example.com/project/webfront
+  imagePullPolicy: IfNotPresent

@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  {{- include "webfront.annotations" . | nindent 2 }}
+  {{- include "webfront.labels" . | nindent 2 }}
+  namespace: {{ .Values.global.namespace }}
+  name: {{ .Values.global.namePrefix }}-webfront-deployment
+spec:
+  replicas: {{ .Values.webfront.replicas }}
+  selector:
+    matchLabels:
+      {{- include "webfront.selectorLabels" $ | nindent 6 }}
+  template:
+    metadata:
+      {{- include "webfront.annotations" . | nindent 6 }}
+      {{- include "webfront.labels" . | nindent 6 }}
+    spec:
+      terminationGracePeriodSeconds: 120
+      imagePullSecrets:
+        - name: {{ .Values.global.namePrefix }}-dockerregistry-secret
+      containers:
+        - name: webfront
+          image: {{ .Values.webfront.image }}:{{ .Values.webfront.imageTag }}
+          imagePullPolicy: {{ .Values.webfront.imagePullPolicy }}
+          ports:
+            - containerPort: 80
+              protocol: TCP
+          env:
+            - name: TZ
+              value: Asia/Shanghai
+            {{- if .Values.webfront.extraEnv }}
+            {{- include "webfront.extraEnv" . | nindent 12 }}
+            {{- end }}
+          resources:
+            requests:
+              cpu: {{ .Values.webfront.cpu }}
+              memory: {{ .Values.webfront.memory }}
+            limits:
+              cpu: {{ .Values.webfront.cpu }}
+              memory: {{ .Values.webfront.memory }}
+          lifecycle:
+            preStop:
+              exec:
+                command: ["/bin/sh", "-c", "sleep 60"]

@@ -1,0 +1,20 @@
+global:
+  namespace: bu-project-prod
+
+apiproxy:
+  replicas: 2
+  cpu: "500m"
+  memory: "1Gi"
+  host: web.example.com
+
+webfront:
+  annotations:
+    app.kubernetes.io/name: webfront 
+  replicas: 2
+  imageTag: "release-2024.09.05.2230"
+  cpu: "1000m"
+  memory: "2Gi"
+  host: web.example.com
+  extraEnv:
+    - name: APP_CONFIG
+      value: prod

@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  {{- include "apiproxy.annotations" . | nindent 2 }}
+  {{- include "apiproxy.labels" . | nindent 2 }}
+  namespace: {{ .Values.global.namespace }}
+  name: {{ .Values.global.namePrefix }}-apiproxy-svc
+spec:
+  clusterIP: None
+  ports:
+    - port: 80
+      targetPort: 80
+      protocol: TCP
+  selector:
+    {{- include "apiproxy.selectorLabels" . | nindent 4 }}
