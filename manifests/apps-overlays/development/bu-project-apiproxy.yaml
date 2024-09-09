@@ -15,7 +15,7 @@ data:
         proxy_redirect off;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Scheme $scheme;
-        proxy_pass https://web.dev.example.com/v1/;
+        proxy_pass https://api.dev.example.com/v1/;
       }
     }
 ---

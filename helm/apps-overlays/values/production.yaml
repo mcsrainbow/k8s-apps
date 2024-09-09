@@ -6,6 +6,7 @@ apiproxy:
   cpu: "500m"
   memory: "1Gi"
   host: web.example.com
+  apiHost: api.example.com
 
 webfront:
   annotations:
