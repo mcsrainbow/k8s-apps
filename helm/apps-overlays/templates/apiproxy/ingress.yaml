@@ -1,8 +1,8 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  {{- include "apiproxy.annotations" . | nindent 2 }}
-  {{- include "apiproxy.labels" . | nindent 2 }}
+  {{- include "snippet.apiproxy.annotations" . | nindent 2 }}
+  {{- include "snippet.apiproxy.labels" . | nindent 2 }}
   namespace: {{ .Values.global.namespace }}
   name: {{ .Values.global.namePrefix }}-apiproxy-ingress
 spec:

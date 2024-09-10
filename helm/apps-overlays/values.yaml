@@ -1,10 +1,14 @@
 global:
   namePrefix: bu-project
   annotations:
-    app.kubernetes.io/managed-by: Kustomization
+    oncallPager: 800-555-1212
+  labels:
+    app.kubernetes.io/managed-by: Helm
 
 apiproxy:
   labels:
+    app: apiproxy
+  selectorLabels:
     app: apiproxy
   image: registry.example.com/project/apiproxy
   imageTag: "1.0"
@@ -12,6 +16,8 @@ apiproxy:
 
 webfront:
   labels:
+    app: webfront
+  selectorLabels:
     app: webfront
   image: registry.example.com/project/webfront
   imagePullPolicy: IfNotPresent

@@ -6,9 +6,6 @@ resources:
   - apps/webfront
   - apps/apiproxy
 
-commonAnnotations:
-  app.kubernetes.io/managed-by: Kustomization
-
 patches:
   - path: patches/imagePullSecrets.yaml
     target:

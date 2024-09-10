@@ -1,7 +1,13 @@
 ---
+# Source: apps-overlays/templates/apiproxy/configmap.yaml
 apiVersion: v1
 kind: ConfigMap
 metadata:
+  annotations:
+    oncallPager: 800-555-1212
+  labels:
+    app.kubernetes.io/managed-by: Manual
+    app: apiproxy
   namespace: bu-project-dev
   name: bu-project-apiproxy-configmap
 data:
@@ -19,12 +25,34 @@ data:
       }
     }
 ---
+# Source: apps-overlays/templates/apiproxy/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    oncallPager: 800-555-1212
+  labels:
+    app.kubernetes.io/managed-by: Manual
+    app: apiproxy
+  namespace: bu-project-dev
+  name: bu-project-apiproxy-svc
+spec:
+  clusterIP: None
+  ports:
+    - port: 80
+      targetPort: 80
+      protocol: TCP
+  selector:
+    app: apiproxy
+---
+# Source: apps-overlays/templates/apiproxy/deployment.yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   annotations:
-    app.kubernetes.io/managed-by: Kustomization
+    oncallPager: 800-555-1212
   labels:
+    app.kubernetes.io/managed-by: Manual
     app: apiproxy
   namespace: bu-project-dev
   name: bu-project-apiproxy-deployment
@@ -36,7 +64,7 @@ spec:
   template:
     metadata:
       annotations:
-        app.kubernetes.io/managed-by: Kustomization
+        oncallPager: 800-555-1212
       labels:
         app: apiproxy
     spec:
@@ -72,30 +100,14 @@ spec:
             - name: apiproxy-configmap-volume
               mountPath: /etc/nginx/conf.d
 ---
-apiVersion: v1
-kind: Service
-metadata:
-  annotations:
-    app.kubernetes.io/managed-by: Kustomization
-  labels:
-    app: apiproxy
-  namespace: bu-project-dev
-  name: bu-project-apiproxy-svc
-spec:
-  clusterIP: None
-  ports:
-    - port: 80
-      targetPort: 80
-      protocol: TCP
-  selector:
-    app: apiproxy
----
+# Source: apps-overlays/templates/apiproxy/ingress.yaml
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   annotations:
-    app.kubernetes.io/managed-by: Kustomization
+    oncallPager: 800-555-1212
   labels:
+    app.kubernetes.io/managed-by: Manual
     app: apiproxy
   namespace: bu-project-dev
   name: bu-project-apiproxy-ingress

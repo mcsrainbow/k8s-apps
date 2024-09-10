@@ -1,8 +1,8 @@
 apiVersion: v1
 kind: Service
 metadata:
-  {{- include "apiproxy.annotations" . | nindent 2 }}
-  {{- include "apiproxy.labels" . | nindent 2 }}
+  {{- include "snippet.apiproxy.annotations" . | nindent 2 }}
+  {{- include "snippet.apiproxy.labels" . | nindent 2 }}
   namespace: {{ .Values.global.namespace }}
   name: {{ .Values.global.namePrefix }}-apiproxy-svc
 spec:
@@ -12,4 +12,4 @@ spec:
       targetPort: 80
       protocol: TCP
   selector:
-    {{- include "apiproxy.selectorLabels" . | nindent 4 }}
+    {{- toYaml .Values.apiproxy.selectorLabels | nindent 4 }}

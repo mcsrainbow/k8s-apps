@@ -10,7 +10,9 @@ resources:
 labels:
   - pairs:
       app: webfront
-    # add labels to spec.selector.matchLabels
     includeSelectors: true
-    # add labels to spec.template.metadata.labels
+    includeTemplates: true
+  - pairs:
+      app.kubernetes.io/component: server
+    includeSelectors: false
     includeTemplates: true

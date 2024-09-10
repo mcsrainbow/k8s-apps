@@ -1,19 +1,20 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  {{- include "apiproxy.annotations" . | nindent 2 }}
-  {{- include "apiproxy.labels" . | nindent 2 }}
+  {{- include "snippet.apiproxy.annotations" . | nindent 2 }}
+  {{- include "snippet.apiproxy.labels" . | nindent 2 }}
   namespace: {{ .Values.global.namespace }}
   name: {{ .Values.global.namePrefix }}-apiproxy-deployment
 spec:
   replicas: {{ .Values.apiproxy.replicas }}
   selector:
     matchLabels:
-      {{- include "apiproxy.selectorLabels" $ | nindent 6 }}
+      {{- toYaml .Values.apiproxy.selectorLabels | nindent 6 }}
   template:
     metadata:
-      {{- include "apiproxy.annotations" . | nindent 6 }}
-      {{- include "apiproxy.labels" . | nindent 6 }}
+      {{- include "snippet.apiproxy.annotations" . | nindent 6 }}
+      labels:
+        {{- toYaml .Values.apiproxy.labels | nindent 8 }}
     spec:
       terminationGracePeriodSeconds: 120
       imagePullSecrets:
@@ -33,7 +34,7 @@ spec:
             - name: TZ
               value: Asia/Shanghai
             {{- if .Values.apiproxy.extraEnv }}
-            {{- include "apiproxy.extraEnv" . | nindent 12 }}
+            {{- toYaml .Values.apiproxy.extraEnv | nindent 12 }}
             {{- end }}
           resources:
             requests:

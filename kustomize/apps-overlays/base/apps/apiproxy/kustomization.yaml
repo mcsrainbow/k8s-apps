@@ -10,7 +10,5 @@ resources:
 labels:
   - pairs:
       app: apiproxy
-    # add labels to spec.selector.matchLabels
     includeSelectors: true
-    # add labels to spec.template.metadata.labels
     includeTemplates: true

@@ -8,12 +8,23 @@ resources:
 namespace: bu-project-uat
 namePrefix: bu-project-
 
+commonAnnotations:
+  oncallPager: 800-555-1212
+
+labels:
+  - pairs:
+      app.kubernetes.io/managed-by: Kustomization
+    includeSelectors: false
+    includeTemplates: false
+
 configMapGenerator:
   - name: apiproxy-configmap
     files:
       - files/nginx.conf
     options:
       disableNameSuffixHash: true
+      labels:
+        app: apiproxy
 
 images:
   - name: registry.example.com/project/webfront

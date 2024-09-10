@@ -9,8 +9,8 @@ apiproxy:
   apiHost: api.dev.example.com
 
 webfront:
-  annotations:
-    app.kubernetes.io/name: webfront
+  labels:
+    app.kubernetes.io/component: server
   replicas: 1
   imageTag: "dev-2024.09.05.0923"
   cpu: "250m"

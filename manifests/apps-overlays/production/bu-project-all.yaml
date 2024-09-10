@@ -1,8 +1,13 @@
 ---
+# Source: apps-overlays/templates/secret.yaml
 apiVersion: v1
 kind: Secret
 metadata:
-  namespace: bu-project-uat
+  annotations:
+    oncallPager: 800-555-1212
+  labels:
+    app.kubernetes.io/managed-by: Manual
+  namespace: bu-project-prod
   name: bu-project-dockerregistry-secret
 type: kubernetes.io/dockerconfigjson
 stringData:

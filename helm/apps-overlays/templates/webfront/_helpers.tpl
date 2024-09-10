@@ -1,30 +1,25 @@
 {{- /*
-global and webfront annotations
+Combine global and webfront annotations
 */ -}}
-{{- define "webfront.annotations" -}}
-{{- $webfrontAnnotations := merge (.Values.webfront.annotations | default (dict)) (.Values.global.annotations | default (dict)) -}}
+{{- define "snippet.webfront.annotations" -}}
 annotations:
-  {{- toYaml $webfrontAnnotations | nindent 2 -}}
+{{- if .Values.global.annotations -}}
+  {{- toYaml .Values.global.annotations | nindent 2 -}}
+{{- end -}}
+{{- if .Values.webfront.annotations -}}
+  {{- toYaml .Values.webfront.annotations | nindent 2 -}}
+{{- end -}}
 {{- end }}
 
 {{- /*
-global and webfront labels
+Combine global and webfront labels
 */ -}}
-{{- define "webfront.labels" -}}
-{{- $webfrontLabels := merge (.Values.webfront.labels | default (dict)) (.Values.global.labels | default (dict)) -}}
+{{- define "snippet.webfront.labels" -}}
 labels:
-  {{- toYaml $webfrontLabels | nindent 2 -}}
-{{- end }}
-
-{{- /*
-webfront selectorLabels
-*/ -}}
-{{- define "webfront.selectorLabels" -}}
-{{- $webfrontSelectorLabels := .Values.webfront.labels -}}
-{{- toYaml $webfrontSelectorLabels -}}
-{{- end }}
-
-{{- define "webfront.extraEnv" -}}
-{{- $webfrontExtraEnv := .Values.webfront.extraEnv | default (list) -}}
-{{- toYaml $webfrontExtraEnv -}}
+{{- if .Values.global.labels -}}
+  {{- toYaml .Values.global.labels | nindent 2 -}}
+{{- end -}}
+{{- if .Values.webfront.labels -}}
+  {{- toYaml .Values.webfront.labels | nindent 2 -}}
+{{- end -}}
 {{- end }}
