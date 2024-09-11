@@ -31,10 +31,10 @@ images:
     newTag: dev-2024.09.05.0923
 
 replicas:
-- name: apiproxy-deployment
-  count: 1
-- name: webfront-deployment
-  count: 1
+  - name: apiproxy-deployment
+    count: 1
+  - name: webfront-deployment
+    count: 1
 
 patches:
   - target:
