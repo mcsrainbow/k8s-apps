@@ -89,7 +89,7 @@ helm/apps-overlays
 └── values.yaml
 ```
 
-```
+```bash
 cd helm/apps-overlays
 helm template . -f values/development.yaml
 helm template . -f values/staging.yaml
