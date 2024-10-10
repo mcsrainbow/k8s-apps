@@ -16,7 +16,7 @@ spec:
     spec:
       terminationGracePeriodSeconds: 120
       imagePullSecrets:
-        - name: register-secret
+        - name: aigc-secret-register
       containers:
         - name: foobar
           image: register.example.com/project/foobar:v1.0
@@ -56,7 +56,7 @@ spec:
           env:
             - name: TZ
               value: Asia/Shanghai
-            - name: aliyun_logs_cgh-aigc-stdout
+            - name: aliyun_logs_aigc-stdout
               value: stdout
             - name: PG_HOST
               valueFrom:
@@ -161,9 +161,9 @@ spec:
   ingressClassName: alb
   tls:
     - hosts:
-        - aigc.cghdigital.com
+        - aigc.example.com
   rules:
-    - host: aigc.cghdigital.com
+    - host: aigc.example.com
       http:
         paths:
           - path: /web
