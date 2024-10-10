@@ -143,7 +143,7 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: foobar-redirect-ingress
-  namespace: aigc-prod
+  namespace: aigc
   annotations:
     alb.ingress.kubernetes.io/actions.redirect-slash: |
       [{
