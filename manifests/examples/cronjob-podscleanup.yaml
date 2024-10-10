@@ -2,7 +2,7 @@
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: ops-podscleanup-role
+  name: podscleanup-role
 rules:
   - apiGroups: ["apps"]
     resources: ["pods", "deployments"]
@@ -11,27 +11,27 @@ rules:
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  namespace: ops-dev
-  name: ops-podscleanup-account
+  namespace: ops
+  name: podscleanup-account
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: ops-podscleanup-binding
+  name: podscleanup-binding
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: ops-podscleanup-role
+  name: podscleanup-role
 subjects:
   - kind: ServiceAccount
-    namespace: ops-dev
-    name: ops-podscleanup-account
+    namespace: ops
+    name: podscleanup-account
 ---
 apiVersion: batch/v1
 kind: CronJob
 metadata:
-  namespace: ops-dev
-  name: ops-podscleanup-etrans
+  namespace: ops
+  name: podscleanup-etrans
 spec:
   schedule: "0 */8 * * *"
   successfulJobsHistoryLimit: 2
@@ -41,9 +41,9 @@ spec:
     spec:
       template:
         spec:
-          serviceAccountName: ops-podscleanup-account
+          serviceAccountName: podscleanup-account
           containers:
-            - name: ops-podscleanup-etrans
+            - name: podscleanup-etrans
               image: bitnami/kubectl:1.27.5
               env:
                 - name: TZ
@@ -71,4 +71,4 @@ spec:
                   echo "INFO: PodsCleanup Completed"
           restartPolicy: OnFailure
           imagePullSecrets:
-            - name: ops-podscleanup-gitlab
+            - name: podscleanup-gitlab

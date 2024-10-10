@@ -1,0 +1,175 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: aigc
+  name: foobar-deploy
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: foobar
+  template:
+    metadata:
+      labels:
+        app: foobar
+    spec:
+      terminationGracePeriodSeconds: 120
+      imagePullSecrets:
+        - name: register-secret
+      containers:
+        - name: foobar
+          image: register.example.com/project/foobar:v1.0
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8080
+          startupProbe:
+            tcpSocket:
+              port: 8080
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            failureThreshold: 10
+            successThreshold: 2
+            timeoutSeconds: 2
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 8080
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            failureThreshold: 3
+            successThreshold: 1
+            timeoutSeconds: 2
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: 8080
+            initialDelaySeconds: 10
+            periodSeconds: 10            
+            failureThreshold: 3
+            successThreshold: 2
+            timeoutSeconds: 2
+          lifecycle:
+            preStop:
+              exec:
+                command: ["/bin/sh", "-c", "sleep 60"]
+          env:
+            - name: TZ
+              value: Asia/Shanghai
+            - name: aliyun_logs_cgh-aigc-stdout
+              value: stdout
+            - name: PG_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: aigc-secret-db
+                  key: PG_HOST
+            - name: PG_PORT
+              valueFrom:
+                secretKeyRef:
+                  name: aigc-secret-db
+                  key: PG_PORT
+            - name: PG_DATABASE
+              valueFrom:
+                secretKeyRef:
+                  name: aigc-secret-db
+                  key: PG_DATABASE
+            - name: PG_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: aigc-secret-db
+                  key: PG_USERNAME
+            - name: PG_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: aigc-secret-db
+                  key: PG_PASSWORD
+            - name: PG_URL
+              value: >-
+                postgresql://$(PG_USERNAME):$(PG_PASSWORD)@$(PG_HOST):$(PG_PORT)/$(PG_DATABASE)
+          resources:
+            requests:
+              cpu: 1000m
+              memory: 2Gi
+            limits:
+              cpu: 1000m
+              memory: 2Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: aigc
+  name: foobar-svc
+spec:
+  ports:
+    - port: 8080
+      targetPort: 8080
+      protocol: TCP
+  selector:
+    app: foobar
+  clusterIP: None
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  namespace: aigc
+  name: foobar-ingress
+  annotations:
+    alb.ingress.kubernetes.io/rewrite-target: /${1}   
+spec:
+  ingressClassName: alb
+  tls:
+    - hosts:
+        - aigc.example.com
+  rules:
+    - host: aigc.example.com
+      http:
+        paths:
+          - path: /web/(.*)
+            pathType: Prefix
+            backend:
+              service:
+                name: foobar-svc
+                port:
+                  number: 8080
+          - path: /api/(.*)
+            pathType: Prefix
+            backend:
+              service:
+                name: foobar-svc
+                port:
+                  number: 8080
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: foobar-redirect-ingress
+  namespace: aigc-prod
+  annotations:
+    alb.ingress.kubernetes.io/actions.redirect-slash: |
+      [{
+          "type": "Redirect",
+          "RedirectConfig": {
+              "host": "${host}",
+              "path": "${path}/",
+              "port": "${port}",
+              "protocol": "${protocol}",
+              "query": "${query}",
+              "httpCode": "301"
+          }
+      }]
+spec:
+  ingressClassName: alb
+  tls:
+    - hosts:
+        - aigc.cghdigital.com
+  rules:
+    - host: aigc.cghdigital.com
+      http:
+        paths:
+          - path: /web
+            pathType: Exact
+            backend:
+              service:
+                name: redirect-slash
+                port:
+                  name: use-annotation
