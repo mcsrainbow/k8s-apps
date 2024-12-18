@@ -29,7 +29,7 @@ spec:
             initialDelaySeconds: 10
             periodSeconds: 10
             failureThreshold: 10
-            successThreshold: 2
+            successThreshold: 1 # must be 1 by design
             timeoutSeconds: 2
           livenessProbe:
             httpGet:
@@ -38,14 +38,14 @@ spec:
             initialDelaySeconds: 10
             periodSeconds: 10
             failureThreshold: 3
-            successThreshold: 1
+            successThreshold: 1 # must be 1 by design
             timeoutSeconds: 2
           readinessProbe:
             httpGet:
               path: /healthz
               port: 8080
             initialDelaySeconds: 10
-            periodSeconds: 10            
+            periodSeconds: 10
             failureThreshold: 3
             successThreshold: 2
             timeoutSeconds: 2
@@ -114,7 +114,7 @@ metadata:
   namespace: aigc
   name: foobar-ingress
   annotations:
-    alb.ingress.kubernetes.io/rewrite-target: /${1}   
+    alb.ingress.kubernetes.io/rewrite-target: /${1}
 spec:
   ingressClassName: alb
   tls:
