@@ -28,7 +28,7 @@ spec:
               port: 8080
             initialDelaySeconds: 10
             periodSeconds: 10
-            failureThreshold: 10
+            failureThreshold: 30
             successThreshold: 1 # must be 1 by design
             timeoutSeconds: 2
           livenessProbe:
@@ -36,16 +36,16 @@ spec:
               path: /healthz
               port: 8080
             initialDelaySeconds: 10
-            periodSeconds: 10
-            failureThreshold: 3
+            periodSeconds: 30
+            failureThreshold: 5
             successThreshold: 1 # must be 1 by design
-            timeoutSeconds: 2
+            timeoutSeconds: 5
           readinessProbe:
             httpGet:
               path: /healthz
               port: 8080
-            initialDelaySeconds: 10
-            periodSeconds: 10
+            initialDelaySeconds: 5
+            periodSeconds: 20
             failureThreshold: 3
             successThreshold: 2
             timeoutSeconds: 2
@@ -100,13 +100,13 @@ metadata:
   namespace: aigc
   name: foobar-svc
 spec:
+  selector:
+    app: foobar
+  clusterIP: None
   ports:
     - port: 8080
       targetPort: 8080
       protocol: TCP
-  selector:
-    app: foobar
-  clusterIP: None
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
@@ -114,6 +114,8 @@ metadata:
   namespace: aigc
   name: foobar-ingress
   annotations:
+    alb.ingress.kubernetes.io/connection-drain-enabled: "true"
+    alb.ingress.kubernetes.io/connection-drain-timeout: "60"
     alb.ingress.kubernetes.io/rewrite-target: /${1}
 spec:
   ingressClassName: alb
