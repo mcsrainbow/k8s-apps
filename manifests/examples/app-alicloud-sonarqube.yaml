@@ -100,13 +100,13 @@ metadata:
   namespace: sonar
   name: sonarqube-svc
 spec:
+  selector:
+    app: sonarqube
+  clusterIP: None
   ports:
     - port: 9000
       targetPort: 9000
       protocol: TCP
-  selector:
-    app: sonarqube
-  clusterIP: None
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
