@@ -38,6 +38,13 @@ spec:
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8080
+          resources:
+            requests:
+              cpu: 1000m
+              memory: 2Gi
+            limits:
+              cpu: 1000m
+              memory: 2Gi
           startupProbe:
             tcpSocket:
               port: 8080
@@ -112,13 +119,6 @@ spec:
             - name: PG_URL
               value: >-
                 postgresql://$(PG_USERNAME):$(PG_PASSWORD)@$(PG_HOST):$(PG_PORT)/$(PG_DATABASE)
-          resources:
-            requests:
-              cpu: 1000m
-              memory: 2Gi
-            limits:
-              cpu: 1000m
-              memory: 2Gi
 ---
 apiVersion: v1
 kind: Service

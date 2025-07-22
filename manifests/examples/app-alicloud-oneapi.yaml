@@ -1,11 +1,10 @@
 ---
 apiVersion: apps/v1
-kind: StatefulSet
+kind: Deployment
 metadata:
   namespace: aigc
-  name: oneapi-sts
+  name: oneapi-deploy
 spec:
-  serviceName: oneapi
   replicas: 1
   selector:
     matchLabels:
@@ -26,11 +25,6 @@ spec:
           ports:
             - containerPort: 3000
               protocol: TCP
-          env:
-            - name: TZ
-              value: Asia/Shanghai
-            - name: aliyun_logs_aigc-stdout
-              value: stdout
           resources:
             requests:
               cpu: 250m
@@ -41,6 +35,11 @@ spec:
           volumeMounts:
             - name: oneapi-data-volume
               mountPath: "/data"
+          env:
+            - name: TZ
+              value: Asia/Shanghai
+            - name: aliyun_logs_aigc-stdout
+              value: stdout
 ---
 apiVersion: v1
 kind: Service
