@@ -34,7 +34,7 @@ spec:
               mountPath: /bazqux
       containers:
         - name: foobar
-          image: register.example.com/project/foobar:v1.0
+          image: register.example.com/project/foobar:release-0.1.0-20250722
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8080
