@@ -67,6 +67,18 @@ spec:
           ports:
             - containerPort: 9000
               protocol: TCP
+          resources:
+            requests:
+              cpu: 500m
+              memory: 1Gi
+            limits:
+              cpu: 2000m
+              memory: 4Gi
+          volumeMounts:
+            - name: sonar-data
+              mountPath: "/opt/sonarqube/data/"
+            - name: sonar-extensions
+              mountPath: "/opt/sonarqube/extensions/"
           env:
             - name: TZ
               value: "Asia/Shanghai"
@@ -81,18 +93,6 @@ spec:
               value: jdbc:postgresql://postgres.example.com:5432/sonar
             - name: aliyun_logs_log-sonar-stdout
               value: stdout
-          resources:
-            requests:
-              cpu: 500m
-              memory: 1Gi
-            limits:
-              cpu: 2000m
-              memory: 4Gi
-          volumeMounts:
-            - name: sonar-data
-              mountPath: "/opt/sonarqube/data/"
-            - name: sonar-extensions
-              mountPath: "/opt/sonarqube/extensions/"
 ---
 apiVersion: v1
 kind: Service
