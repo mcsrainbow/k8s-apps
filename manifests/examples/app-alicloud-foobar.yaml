@@ -2,7 +2,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  namespace: aigc
+  namespace: foobar
   name: foobar-deploy
 spec:
   replicas: 1
@@ -16,7 +16,22 @@ spec:
     spec:
       terminationGracePeriodSeconds: 120
       imagePullSecrets:
-        - name: aigc-secret-register
+        - name: foobar-secret-register
+      volumes:
+        - name: bazqux-volume
+          emptyDir: {}
+      initContainers:
+        - name: download-bazqux-agent
+          image: busybox:latest
+          imagePullPolicy: IfNotPresent
+          command: ["sh", "-c"]
+          args:
+            - |
+              echo "INFO: Downloading /bazqux/agent.jar..." \
+              && wget --no-check-certificate -O /bazqux/agent.jar https://example.com/bazqux/agent.jar
+          volumeMounts:
+            - name: bazqux-volume
+              mountPath: /bazqux
       containers:
         - name: foobar
           image: register.example.com/project/foobar:v1.0
@@ -53,35 +68,46 @@ spec:
             preStop:
               exec:
                 command: ["/bin/sh", "-c", "sleep 60"]
+          volumeMounts:
+            - name: bazqux-volume
+              mountPath: /bazqux
           env:
+            - name: "BAZQUX_SITE"
+              value: "bazqux.example.org"
+            - name: "BAZQUX_PORT"
+              value: "857"
+            - name: "BAZQUX_TOKEN"
+              value: "abc1DeF2GH3ij4KLm"
+            - name: "JAVA_TOOL_OPTIONS"
+              value: "-javaagent:/bazqux/agent.jar"
             - name: TZ
               value: Asia/Shanghai
-            - name: aliyun_logs_aigc-stdout
+            - name: aliyun_logs_foobar-stdout
               value: stdout
             - name: PG_HOST
               valueFrom:
                 secretKeyRef:
-                  name: aigc-secret-db
+                  name: foobar-secret-db
                   key: PG_HOST
             - name: PG_PORT
               valueFrom:
                 secretKeyRef:
-                  name: aigc-secret-db
+                  name: foobar-secret-db
                   key: PG_PORT
             - name: PG_DATABASE
               valueFrom:
                 secretKeyRef:
-                  name: aigc-secret-db
+                  name: foobar-secret-db
                   key: PG_DATABASE
             - name: PG_USERNAME
               valueFrom:
                 secretKeyRef:
-                  name: aigc-secret-db
+                  name: foobar-secret-db
                   key: PG_USERNAME
             - name: PG_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: aigc-secret-db
+                  name: foobar-secret-db
                   key: PG_PASSWORD
             - name: PG_URL
               value: >-
@@ -97,7 +123,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  namespace: aigc
+  namespace: foobar
   name: foobar-svc
 spec:
   selector:
@@ -111,7 +137,7 @@ spec:
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  namespace: aigc
+  namespace: foobar
   name: foobar-ingress
   annotations:
     alb.ingress.kubernetes.io/connection-drain-enabled: "true"
@@ -121,9 +147,9 @@ spec:
   ingressClassName: alb
   tls:
     - hosts:
-        - aigc.example.com
+        - foobar.example.com
   rules:
-    - host: aigc.example.com
+    - host: foobar.example.com
       http:
         paths:
           - path: /web/(.*)
@@ -145,7 +171,7 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: foobar-redirect-ingress
-  namespace: aigc
+  namespace: foobar
   annotations:
     alb.ingress.kubernetes.io/actions.redirect-slash: |
       [{
@@ -163,9 +189,9 @@ spec:
   ingressClassName: alb
   tls:
     - hosts:
-        - aigc.example.com
+        - foobar.example.com
   rules:
-    - host: aigc.example.com
+    - host: foobar.example.com
       http:
         paths:
           - path: /web
