@@ -1,5 +1,7 @@
 # k8s-apps
 
+Blog Post: [Kubernetes Multi-environment and Multi-application Orchestration Practice](https://blog.heylinux.com/en/2024/09/kubernetes-multi-environment-and-multi-application-orchestration-practice/)
+
 ## Manifests practice
 
 ```
