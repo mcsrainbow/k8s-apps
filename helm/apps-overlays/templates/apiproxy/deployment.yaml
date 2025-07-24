@@ -30,12 +30,6 @@ spec:
           ports:
             - containerPort: 80
               protocol: TCP
-          env:
-            - name: TZ
-              value: Asia/Shanghai
-            {{- if .Values.apiproxy.extraEnv }}
-            {{- toYaml .Values.apiproxy.extraEnv | nindent 12 }}
-            {{- end }}
           resources:
             requests:
               cpu: {{ .Values.apiproxy.cpu }}
@@ -50,3 +44,9 @@ spec:
           volumeMounts:
             - name: apiproxy-configmap-volume
               mountPath: /etc/nginx/conf.d
+          env:
+            - name: TZ
+              value: Asia/Shanghai
+            {{- if .Values.apiproxy.extraEnv }}
+            {{- toYaml .Values.apiproxy.extraEnv | nindent 12 }}
+            {{- end }}

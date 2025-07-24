@@ -14,9 +14,6 @@ spec:
           ports:
             - containerPort: 8080
               protocol: TCP
-          env:
-            - name: TZ
-              value: Asia/Shanghai
           resources:
             requests:
               cpu: 250m
@@ -28,3 +25,6 @@ spec:
             preStop:
               exec:
                 command: ["/bin/sh", "-c", "sleep 60"]
+          env:
+            - name: TZ
+              value: Asia/Shanghai

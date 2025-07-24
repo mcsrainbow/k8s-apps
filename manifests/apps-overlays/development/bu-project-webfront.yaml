@@ -12,13 +12,13 @@ metadata:
   namespace: bu-project-dev
   name: bu-project-webfront-svc
 spec:
+  selector:
+    app: webfront
   clusterIP: None
   ports:
     - port: 8080
       targetPort: 8080
       protocol: TCP
-  selector:
-    app: webfront
 ---
 # Source: apps-overlays/templates/webfront/deployment.yaml
 apiVersion: apps/v1
@@ -55,11 +55,6 @@ spec:
           ports:
             - containerPort: 8080
               protocol: TCP
-          env:
-            - name: TZ
-              value: Asia/Shanghai
-            - name: APP_CONFIG
-              value: dev
           resources:
             requests:
               cpu: 250m
@@ -71,6 +66,11 @@ spec:
             preStop:
               exec:
                 command: ["/bin/sh", "-c", "sleep 60"]
+          env:
+            - name: TZ
+              value: Asia/Shanghai
+            - name: APP_CONFIG
+              value: dev
 ---
 # Source: apps-overlays/templates/webfront/ingress.yaml
 apiVersion: networking.k8s.io/v1

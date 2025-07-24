@@ -26,12 +26,6 @@ spec:
           ports:
             - containerPort: 8080
               protocol: TCP
-          env:
-            - name: TZ
-              value: Asia/Shanghai
-            {{- if .Values.webfront.extraEnv }}
-            {{- toYaml .Values.webfront.extraEnv | nindent 12 }}
-            {{- end }}
           resources:
             requests:
               cpu: {{ .Values.webfront.cpu }}
@@ -43,3 +37,9 @@ spec:
             preStop:
               exec:
                 command: ["/bin/sh", "-c", "sleep 60"]
+          env:
+            - name: TZ
+              value: Asia/Shanghai
+            {{- if .Values.webfront.extraEnv }}
+            {{- toYaml .Values.webfront.extraEnv | nindent 12 }}
+            {{- end }}

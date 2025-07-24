@@ -6,10 +6,10 @@ metadata:
   namespace: {{ .Values.global.namespace }}
   name: {{ .Values.global.namePrefix }}-apiproxy-svc
 spec:
+  selector:
+    {{- toYaml .Values.apiproxy.selectorLabels | nindent 4 }}
   clusterIP: None
   ports:
     - port: 80
       targetPort: 80
       protocol: TCP
-  selector:
-    {{- toYaml .Values.apiproxy.selectorLabels | nindent 4 }}
