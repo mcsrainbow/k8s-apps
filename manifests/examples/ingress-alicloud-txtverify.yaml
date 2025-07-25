@@ -1,0 +1,46 @@
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  namespace: ops
+  name: txtverify-ingress
+  annotations:
+    alb.ingress.kubernetes.io/order: "857"
+    alb.ingress.kubernetes.io/actions.txt-verify: |
+      [
+        {
+          "type": "FixedResponse",
+          "FixedResponseConfig": {
+            "httpCode": "200",
+            "contentType": "text/plain",
+            "content": "Ab8C5d7EFgHIj98k"
+          }
+        }
+      ]
+spec:
+  ingressClassName: alb
+  tls:
+    - hosts:
+        - app.example.com
+        - app.example.org
+  rules:
+    - host: app.example.com
+      http:
+        paths:
+          - path: /WW_verify_Ab8C5d7EFgHIj98k.txt
+            pathType: Exact
+            backend:
+              service:
+                name: txt-verify
+                port:
+                  name: use-annotation
+    - host: app.example.org
+      http:
+        paths:
+          - path: /WW_verify_Ab8C5d7EFgHIj98k.txt
+            pathType: Exact
+            backend:
+              service:
+                name: txt-verify
+                port:
+                  name: use-annotation
