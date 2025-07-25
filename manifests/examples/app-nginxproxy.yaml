@@ -1,0 +1,111 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  namespace: ops
+  name: nginxproxy-configmap
+data:
+  nginx.conf: |
+    server {
+        listen 80;
+
+        location ^~ /api/foo/
+        {
+            proxy_pass_header Server;
+            proxy_set_header Host $http_host;
+            proxy_redirect off;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Scheme $scheme;
+            proxy_pass https://baz.example.com:8443/api/v1/foo/;
+        }
+
+        location ^~ /api/bar/xyz/
+        {
+            proxy_pass_header Server;
+            proxy_set_header Host $http_host;
+            proxy_redirect off;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Scheme $scheme;
+            proxy_pass https://qux.example.org:9443/api/v1/bar/xyz/;
+        }
+    }
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: ops
+  name: nginxproxy-deploy
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nginxproxy
+  template:
+    metadata:
+      labels:
+        app: nginxproxy
+    spec:
+      volumes:
+        - name: nginxproxy-configmap-volume
+          configMap:
+            name: nginxproxy-configmap
+      containers:
+        - name: nginxproxy
+          image: nginx:1.29-alpine3.22
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 80
+              protocol: TCP
+          resources:
+            requests:
+              cpu: "0.25"
+              memory: "500Mi"
+          volumeMounts:
+            - name: nginxproxy-configmap-volume
+              mountPath: /etc/nginx/conf.d
+          env:
+            - name: TZ
+              value: Asia/Shanghai
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: ops
+  name: nginxproxy-svc
+spec:
+  selector:
+    app: nginxproxy
+  clusterIP: None
+  ports:
+    - port: 80
+      targetPort: 80
+      protocol: TCP
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  namespace: ops
+  name: nginxproxy-ingress
+spec:
+  ingressClassName: alb
+  tls:
+    - hosts:
+        - proxy.heylinux.com
+  rules:
+    - host: proxy.heylinux.com
+      http:
+        paths:
+          - path: /api/foo/
+            pathType: Prefix
+            backend:
+              service:
+                name: nginxproxy-svc
+                port:
+                  number: 80
+          - path: /api/bar/xyz/
+            pathType: Prefix
+            backend:
+              service:
+                name: nginxproxy-svc
+                port:
+                  number: 80
