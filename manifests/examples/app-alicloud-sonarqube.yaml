@@ -72,6 +72,15 @@ spec:
               name: sonarqube-data
             - mountPath: /opt/sonarqube/extensions/
               name: sonarqube-extensions
+          readinessProbe:
+            httpGet:
+              path: /sonar/api/system/status
+              port: 9000
+            initialDelaySeconds: 120
+            periodSeconds: 20
+            failureThreshold: 3
+            successThreshold: 2
+            timeoutSeconds: 5
           env:
             - name: TZ
               value: "Asia/Shanghai"
