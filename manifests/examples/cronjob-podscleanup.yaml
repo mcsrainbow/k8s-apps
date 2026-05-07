@@ -45,7 +45,7 @@ spec:
           restartPolicy: OnFailure
           containers:
             - name: podscleanup-etrans
-              image: bitnami/kubectl:1.27.5
+              image: alpine/kubectl:1.36.0
               env:
                 - name: TZ
                   value: "Asia/Shanghai"
