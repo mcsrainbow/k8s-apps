@@ -56,7 +56,7 @@ spec:
           args:
             - -Dsonar.web.context=/sonar
             - -Dsonar.core.serverBaseURL=https://devops.example.com/sonar
-          imagePullPolicy: Always
+          imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 9000
               protocol: TCP
