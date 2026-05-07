@@ -19,22 +19,22 @@ metadata:
   namespace: sonar
   name: sonarqube-sts
 spec:
-  serviceName: "sonarqube"
+  serviceName: "sonarqube-svc"
   replicas: 1
   selector:
     matchLabels:
       app: sonarqube
   volumeClaimTemplates:
     - metadata:
-        name: sonar-data
+        name: sonarqube-data
       spec:
         accessModes: ["ReadWriteOnce"]
         storageClassName: alicloud-disk-available
         resources:
           requests:
-            storage: 20Gi
+            storage: 50Gi
     - metadata:
-        name: sonar-extensions
+        name: sonarqube-extensions
       spec:
         accessModes: ["ReadWriteOnce"]
         storageClassName: alicloud-disk-available
@@ -50,16 +50,9 @@ spec:
         runAsUser: 1000
         runAsGroup: 1000
         fsGroup: 1000
-      volumes:
-        - name: sonar-data
-          persistentVolumeClaim:
-            claimName: sonarqube-pvc-data
-        - name: sonar-extensions
-          persistentVolumeClaim:
-            claimName: sonarqube-pvc-extensions
       containers:
         - name: sonarqube
-          image: sonarqube:10.1.0-community
+          image: sonarqube:26.4.0.121862-community
           args:
             - -Dsonar.web.context=/sonar
             - -Dsonar.core.serverBaseURL=https://devops.example.com/sonar
@@ -69,16 +62,16 @@ spec:
               protocol: TCP
           resources:
             requests:
-              cpu: 500m
-              memory: 1Gi
+              cpu: 1000m
+              memory: 2Gi
             limits:
               cpu: 2000m
               memory: 4Gi
           volumeMounts:
-            - name: sonar-data
-              mountPath: "/opt/sonarqube/data/"
-            - name: sonar-extensions
-              mountPath: "/opt/sonarqube/extensions/"
+            - mountPath: /opt/sonarqube/data/
+              name: sonarqube-data
+            - mountPath: /opt/sonarqube/extensions/
+              name: sonarqube-extensions
           env:
             - name: TZ
               value: "Asia/Shanghai"
