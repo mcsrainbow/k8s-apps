@@ -14,33 +14,17 @@ stringData:
   password: sonarqube
 ---
 apiVersion: apps/v1
-kind: StatefulSet
+kind: Deployment
 metadata:
   namespace: sonar
-  name: sonarqube-sts
+  name: sonarqube-deploy
 spec:
-  serviceName: "sonarqube-svc"
   replicas: 1
   selector:
     matchLabels:
       app: sonarqube
-  volumeClaimTemplates:
-    - metadata:
-        name: sonarqube-data
-      spec:
-        accessModes: ["ReadWriteOnce"]
-        storageClassName: alicloud-disk-available
-        resources:
-          requests:
-            storage: 50Gi
-    - metadata:
-        name: sonarqube-extensions
-      spec:
-        accessModes: ["ReadWriteOnce"]
-        storageClassName: alicloud-disk-available
-        resources:
-          requests:
-            storage: 20Gi
+  strategy:
+    type: Recreate
   template:
     metadata:
       labels:
@@ -50,6 +34,26 @@ spec:
         runAsUser: 1000
         runAsGroup: 1000
         fsGroup: 1000
+        fsGroupChangePolicy: OnRootMismatch
+      volumes:
+        - name: sonarqube-volume
+          persistentVolumeClaim:
+            claimName: sonarqube-pvc
+      initContainers:
+        - name: init-dirs
+          image: busybox
+          command:
+            - sh
+            - -c
+            - |
+              mkdir -p /mnt/data /mnt/extensions
+              chown -R 1000:1000 /mnt/data /mnt/extensions
+          securityContext:
+            runAsUser: 0
+            runAsGroup: 0
+          volumeMounts:
+            - name: sonarqube-volume
+              mountPath: /mnt
       containers:
         - name: sonarqube
           image: sonarqube:26.4.0.121862-community
@@ -68,10 +72,12 @@ spec:
               cpu: 2000m
               memory: 4Gi
           volumeMounts:
-            - mountPath: /opt/sonarqube/data/
-              name: sonarqube-data
-            - mountPath: /opt/sonarqube/extensions/
-              name: sonarqube-extensions
+            - name: sonarqube-volume
+              mountPath: /opt/sonarqube/data
+              subPath: data
+            - name: sonarqube-volume
+              mountPath: /opt/sonarqube/extensions
+              subPath: extensions
           readinessProbe:
             httpGet:
               path: /sonar/api/system/status
@@ -95,6 +101,42 @@ spec:
               value: jdbc:postgresql://postgres.example.com:5432/sonar
             - name: aliyun_logs_log-sonar-stdout
               value: stdout
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  namespace: sonar
+  name: sonarqube-pvc
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 100Gi
+  selector:
+    matchLabels:
+      alicloud-pvname: sonarqube-pv
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: sonarqube-pv
+  labels:
+    alicloud-pvname: sonarqube-pv
+spec:
+  capacity:
+    storage: 100Gi
+  accessModes:
+    - ReadWriteMany
+  csi:
+    driver: nasplugin.csi.alibabacloud.com
+    volumeHandle: sonarqube-pv
+    volumeAttributes:
+      server: "857abc857a-bc85.cn-hangzhou.nas.aliyuncs.com"
+      path: "/sonarqube"
+  mountOptions:
+    - nolock,tcp,noresvport
+    - vers=3
 ---
 apiVersion: v1
 kind: Service
