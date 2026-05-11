@@ -51,8 +51,6 @@ spec:
             initialDelaySeconds: 10
             periodSeconds: 10
             failureThreshold: 30
-            successThreshold: 1 # must be 1 by design
-            timeoutSeconds: 2
           livenessProbe:
             httpGet:
               path: /healthz
@@ -60,7 +58,6 @@ spec:
             initialDelaySeconds: 10
             periodSeconds: 30
             failureThreshold: 5
-            successThreshold: 1 # must be 1 by design
             timeoutSeconds: 5
           readinessProbe:
             httpGet:
