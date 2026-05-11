@@ -9,6 +9,8 @@ spec:
   selector:
     matchLabels:
       app: oneapi
+  strategy:
+    type: Recreate
   template:
     metadata:
       labels:
@@ -40,6 +42,42 @@ spec:
               value: Asia/Shanghai
             - name: aliyun_logs_aigc-stdout
               value: stdout
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  namespace: aigc
+  name: oneapi-data-pvc
+spec:
+  selector:
+    matchLabels:
+      alicloud-pvname: oneapi-data-pv
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 2Gi
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: oneapi-data-pv
+  labels:
+    alicloud-pvname: oneapi-data-pv
+spec:
+  capacity:
+    storage: 2Gi
+  accessModes:
+    - ReadWriteMany
+  csi:
+    driver: nasplugin.csi.alibabacloud.com
+    volumeHandle: oneapi-data-pv
+    volumeAttributes:
+      server: "857abc857a-bc85.cn-hangzhou.nas.aliyuncs.com"
+      path: "/oneapi-data"
+  mountOptions:
+    - nolock,tcp,noresvport
+    - vers=3
 ---
 apiVersion: v1
 kind: Service
@@ -78,39 +116,3 @@ spec:
                 name: oneapi-svc
                 port:
                   number: 3000
----
-kind: PersistentVolumeClaim
-apiVersion: v1
-metadata:
-  namespace: aigc
-  name: oneapi-data-pvc
-spec:
-  selector:
-    matchLabels:
-      alicloud-pvname: oneapi-data-pv
-  accessModes:
-    - ReadWriteMany
-  resources:
-    requests:
-      storage: 2Gi
----
-apiVersion: v1
-kind: PersistentVolume
-metadata:
-  name: oneapi-data-pv
-  labels:
-    alicloud-pvname: oneapi-data-pv
-spec:
-  capacity:
-    storage: 2Gi
-  accessModes:
-    - ReadWriteMany
-  csi:
-    driver: nasplugin.csi.alibabacloud.com
-    volumeHandle: oneapi-data-pv
-    volumeAttributes:
-      server: "857abc857a-bc85.cn-hangzhou.nas.aliyuncs.com"
-      path: "/oneapi-data"
-  mountOptions:
-    - nolock,tcp,noresvport
-    - vers=3
